@@ -1,0 +1,9 @@
+//
+//
+// this is a dummy config.h.in
+//
+//
+
+#undef HAVE_WESTMERE
+
+#undef HAVE_HASWELL
