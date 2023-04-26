@@ -10,13 +10,14 @@
 # platform not supported by NSD here is undesirable. Builds for standalone use
 # or development/testing are required to use CMake.
 
-sinclude(m4/ax_check_compile_flag.m4)
 
 AC_INIT([simdzone],[0.1.0])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
+AC_PROG_CC
 AC_CONFIG_HEADERS([config.h])
 
-m4_version_prereq([2.70], [AC_PROG_CC], [AC_PROG_CC_STDC])
-AC_CONFIG_FILES([Makefile])
+#m4_version_prereq([2.70], [AC_PROG_CC], [AC_PROG_CC_STDC])
+AC_CONFIG_FILES([Makefile src/Makefile])
 
 # Figure out the canonical target architecture.
 AC_CANONICAL_TARGET
@@ -31,6 +32,8 @@ case "$target" in
   *)                   ;;
 esac
 
+sinclude(m4/ax_check_compile_flag.m4)
+
 if test $x86_64 = "yes"; then
   AC_CHECK_HEADER(immintrin.h,,,)
   AX_CHECK_COMPILE_FLAG([-march=westmere],,,[-Werror])
@@ -40,18 +43,16 @@ if test $x86_64 = "yes"; then
           $ax_cv_check_cflags__Werror__march_westmere = "yes"
   then
     AC_DEFINE(HAVE_WESTMERE, 1, [Wether or not to compile support for SSE4.2])
-    HAVE_WESTMERE=WESTMERE
   fi
 
   if test $ac_cv_header_immintrin_h = "yes" -a \
           $ax_cv_check_cflags__Werror__march_haswell = "yes"
   then
     AC_DEFINE(HAVE_HASWELL, 1, [Wether or not to compile support for AVX2])
-    HAVE_HASWELL=HASWELL
   fi
 fi
 
-AC_SUBST([HAVE_WESTMERE])
-AC_SUBST([HAVE_HASWELL])
+AM_CONDITIONAL([WESTMERE], [ test x$ax_cv_check_cflags__Werror__march_westmere = xyes ])
+AM_CONDITIONAL([HASWELL], [ test x$ax_cv_check_cflags__Werror__march_haswell = xyes ])
 
 AC_OUTPUT
